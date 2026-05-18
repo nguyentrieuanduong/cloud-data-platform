@@ -1,0 +1,11 @@
+---
+minimum_severity: MEDIUM
+
+exclude:
+  # We deliberately use AWS-managed default keys at v0 (decision logged in ADR).
+  # Revisit when a regulatory requirement appears.
+  - aws-s3-encryption-customer-key
+  - aws-rds-encryption-customer-key
+  - aws-redshift-use-vpc
+
+exclude_downloaded_modules: true
