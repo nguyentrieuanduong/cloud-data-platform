@@ -1,0 +1,51 @@
+name: terraform-apply
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "bootstrap/**"
+      - "modules/**"
+      - "envs/**"
+      - ".github/workflows/terraform-*.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  apply:
+    name: apply ${{ matrix.env }}
+    runs-on: ubuntu-latest
+    environment: ${{ matrix.env }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - env: uat
+            role_secret: AWS_ROLE_TO_ASSUME_UAT
+          - env: prod
+            role_secret: AWS_ROLE_TO_ASSUME_PROD
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+
+      - name: Install Terragrunt
+        run: |
+          curl -L -o terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v0.72.6/terragrunt_linux_amd64
+          chmod +x terragrunt
+          sudo mv terragrunt /usr/local/bin/terragrunt
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: ${{ secrets[matrix.role_secret] }}
+
+      - name: Terragrunt apply
+        working-directory: envs/${{ matrix.env }}/ap-southeast-1
+        run: terragrunt run-all apply --terragrunt-non-interactive

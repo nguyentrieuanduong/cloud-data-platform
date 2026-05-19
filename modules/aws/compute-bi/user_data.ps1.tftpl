@@ -1,0 +1,7 @@
+<powershell>
+[Environment]::SetEnvironmentVariable("HTTP_PROXY", "http://${proxy_host}:${proxy_port}", "Machine")
+[Environment]::SetEnvironmentVariable("HTTPS_PROXY", "http://${proxy_host}:${proxy_port}", "Machine")
+[Environment]::SetEnvironmentVariable("NO_PROXY", "169.254.169.254,.amazonaws.com", "Machine")
+New-Item -ItemType Directory -Force -Path "C:\vpbs-eda" | Out-Null
+"REPO_SERVER=${repo_server_host}:${repo_server_port}" | Out-File -FilePath "C:\vpbs-eda\platform.env"
+</powershell>

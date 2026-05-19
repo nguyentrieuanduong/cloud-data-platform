@@ -1,0 +1,16 @@
+#!/bin/bash
+set -euo pipefail
+
+cat >/etc/profile.d/proxy.sh <<'EOF'
+export HTTP_PROXY=http://${proxy_host}:${proxy_port}
+export HTTPS_PROXY=http://${proxy_host}:${proxy_port}
+export NO_PROXY=169.254.169.254,.amazonaws.com
+EOF
+
+mkdir -p /opt/vpbs-eda
+cat >/opt/vpbs-eda/platform.env <<'EOF'
+HTTP_PROXY=http://${proxy_host}:${proxy_port}
+HTTPS_PROXY=http://${proxy_host}:${proxy_port}
+NO_PROXY=169.254.169.254,.amazonaws.com
+REPO_SERVER=${repo_server_host}:${repo_server_port}
+EOF
